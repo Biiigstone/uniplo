@@ -1,0 +1,87 @@
+나는.. 순수 스프링..
+프로젝트 구조..
+스프링 MVC, core 
+
+구조를 잡기 위해선 context 개념이 있어야 한다.
+
+서블릿 컨테이너가 서블릿을 어떻게 시작하는가?
+1. 톰캣 시작 -> WAR 로드
+WAR : Web Application Archive. 웹 애플리케이션을 구성할 때 필요한 자원을 압축한 jar 파일.
+배포서술자(web.xml)을 통해 경로 지정을 해주어야 하며, WEB-INF 등의 사전 정의된 구조를 사용함.
+2. web.xml 기반 서블릿 인스턴스 초기화(init)
+3. HTTP 요청이 들어오면 URL-패턴 매칭으로 해당 서블릿의 기능 호출.
+=> 즉, 하나의 WAR에서 기능을 중심으로 여러 서블릿으로 분할. (URL 패턴으로 구분)
+
+서블릿 : 웹페이지를 동적으로생성하기 위한 자바 클래스.
+우리가 대표적으로 사용하는 서블릿 ; HttpServlet, DispatcherServlet
+이 서블릿이 웹페이지로 작동하도록 돕는 것이 서블릿 컨테이너. 즉, 서블릿 실행 환경 조성을 서블릿 컨테이너가 담당한다 이말이야. 대표적인 것으론 톰캣이 있지.
+
+그리고 여기서 spring의 컨텍스트 개념이 등장한다. 
+스프링의 주요 특징은 IoC 개념의 적용이야.
+Inversion of Control. 제어의 역전.
+그동안은 우리가 라이브러리를 불러와 직접 객체를 생성하고, 그 생명 주기를 통제했다면..
+스프링은 반대로 우리는 클래스를 정의할 뿐, 그 객체의 생성과 생명주기를 스프링이 통제해.
+이것이 제어의 역전이야.
+
+그래서 스프링은 자신이 관리하는 객체를 Bean이라 지칭해.
+context는 여러 역할이 있지만, 그 중 Bean의 boundary를 정하는 역할도 담당해.
+
+여기서 용어 정리. 스프링에서 사용되는 context는 정확히 말하자면 AC(ApplicationContext)를 의미한다.
+즉, Root AC와 Web AC가 있고, 별개로 서블릿 전체인 Servlet Context가 존재한다.
+
+1. ServletContext
+정의 : Servlet 스펙에서 규정한 웹 애플리케이션 전역 저장소이자 API 객체
+Servlet 스펙 : 자바 기반 웹 애플리케이션 개발 시 서블릿이 지켜야하는 표준 규격. 이 구현체가 톰캣.
+생성 시점 : WAR 가 배포(시작)될 때, 컨테이너가 1개 생성.
+범위 : 동일 WAR 내부 모든 서블릿, 필터, 리스너가 공유
+
+2. Root ApplicationContext(스프링 전용, ContextLoaderListener가 만듦)
+정의 : Spring IoC 컨테이너 중 전역 빈 저장소. 비즈니스, 데이터 계층 빈 배치
+생성 시점 : ContextLoaderListener가 ServletContext 초기화 이벤트를 받아 applicationContext.xml 또는 자바 설정을 읽어 1개 생성. Servlet Context는 Root AC 참조를 속성으로 저장. (applicationContext.xml이 기본이고, root- 는 컨벤션)
+범위 : 동일 WAR의 모든 하위 WebApplicationContext에 부모로 연결(빈 재사용, 공유)
+
+3. WebApplicationContext
+정의 : DispatcherServlet 전용 IoC 컨테이너. 웹 계층 빈 보관.
+생성 시점 : 톰캣이 DispatcherServlet을 초기화할 때, 서블릿 당 1개 생성
+범위 : 해당 DisptacherServlet에서만 국한.
+
+톰캣 프로세스 (Servlet Container)
+└─ WAR (/shop)  ← ★ServletContext★  (스펙, 단 하나)
+     ├─ ContextLoaderListener →  ◈RootApplicationContext◈
+     ├─ DispatcherServlet#1  →  ◎WebApplicationContext#1◎  (/api/*)
+     └─ DispatcherServlet#2  →  ◎WebApplicationContext#2◎  (/admin/*)
+
+=> Spring-Context는 ApplicationContext 인터페이스와 기본 구현체들이 속한 라이브러리.
+동시에 스프링 IoC 컨테이너인 ApplicationContext를 지칭함.
+
+스프링은 Root AC와 Web AC 형태를 취한다. 
+자식인 Web AC는 Root AC의 Bean을 사용할 수 있으나, 그 역은 불가능하다.
+따라서 통상적으로 Root AC는 각 서블릿들이 공통적으로 사용하는 비즈니스, 데이터 계층 빈이 속한다.
+반면 Web AC는 그 서블릿만 사용하는 웹 계층(컨트롤러, 뷰 리졸버 등)빈을 저장한다.
+
+즉, bean이 속한 context에 따라 그 바운더리가 정해지기 때문에 디렉토리 구조를 잘 짜놓는 것이 중요하다.
+root AC에 속할 것들은 모든 서블릿에서 공유하는 것들. 즉, core 하위에.
+web AC에 속할 것들은 각 서블릿만 사용하는 것이므로, 각 도메인 디렉토리 하위에.
+
+
+따라서 이 개념을 머리에 넣고 디렉토리 구조를 정의해보자.
+그리고 왜 여기에 들어갔는지 한번 적어보자.
+
+일단 전부 적어보기
+모델(컨트롤러<->뷰) : 모델 데이터 전달 컨테이너 개념. 그 안에 담는 객체는 DTO나 도메인 객체.
+컨트롤러
+서비스
+dto
+dao
+view
+domain model / entity
+
+core에 들어갈 것 - Root AC에서 공유할 것.. 비즈니스 로직.. 데이터 관련.. 비즈니스 인프라 공통요소
+- Service
+- domain model
+- dao 
+
+web에 들어갈 것 - 자기만 사용할 것.. 웹 종속적인 것.. HTTP 요청 처리에 직결되는 것..
+- 컨트롤러
+- DTO
+
