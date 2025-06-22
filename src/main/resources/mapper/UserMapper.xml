@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.barcode.core.user.repository.UserMapper">
+
+    <!-- 이제 매핑될 SQL문을 여기에 작성하면 된다.-->
+
+    <!-- 타입 앨리어스 작성했으므로.. 간단히 쓸 수 있음. -->
+    <!-- 실제 테이블명은 여기서 유추하지 않음. 내가 직접 적는 것.-->
+    <!--VALUES는 그 컬럼에 들어갈 실제 값들을 나열하는 부분으로, MyBatis에선 #{필드명} 형식으로 자바 객체에서 값을 꺼내 바인딩.-->
+
+    <!-- CREATE -->
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO users (user_email, user_password, user_last_name, user_first_name, user_phone_number, user_birth_date, is_agreed, user_status, user_role)
+        VALUES (#{userEmail}, #{userPassword}, #{userLastName}, #{userFirstName}, #{userPhoneNumber}, #{userBirthDate}, #{isAgreed}, #{userStatus}, #{userRole})
+    </insert>
+
+    <!-- READ -->
+    <select id="findUserById" parameterType="long" resultType="User">
+        SELECT * FROM users
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findUserByEmail" parameterType="string" resultType="User">
+        SELECT * FROM users
+        WHERE user_email = #{email}
+    </select>
+
+    <select id="findAll" resultType="User">
+        SELECT * FROM users
+    </select>
+
+    <!-- UPDATE -->
+    <update id="updateUser" parameterType="User">
+        UPDATE users
+        SET user_email = #{userEmail},
+        user_password = #{userPassword},
+        user_last_name = #{userLastName},
+        user_first_name = #{userFirstName},
+        user_phone_number = #{userPhoneNumber},
+        user_birth_date = #{userBirthDate},
+        is_agreed = #{isAgreed},
+        user_status = #{userStatus},
+        user_role = #{userRole}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- DELETE -->
+    <delete id="deleteUserById" parameterType="long">
+        DELETE FROM users
+        WHERE user_id = #{userId}
+    </delete>
+
+    <!-- EXTRA -->
+    <select id="findUserByRole" parameterType="string" resultType="User">
+        SELECT * FROM users
+        WHERE user_role = #{role}
+    </select>
+
+    <select id="countByUserEmail" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM users
+        WHERE user_email = #{email}
+    </select>
+
+</mapper>

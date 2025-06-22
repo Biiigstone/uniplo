@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context
+           https://www.springframework.org/schema/context/spring-context.xsd
+         http://www.springframework.org/schema/tx
+           https://www.springframework.org/schema/tx/spring-tx.xsd
+         http://mybatis.org/schema/mybatis-spring
+           https://mybatis.org/schema/mybatis-spring.xsd
+         http://www.springframework.org/schema/mvc
+          https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 1.  환경별 JDBC 프로퍼티 로- -->
+    <!--   src/main/resources/jdbc-dev.properties, jdbc-prod.properties       -->
+<!--    classpath란? 자바 프로그램이 실행중 필요한 파일을 어디서 찾을 지 미리 정해놓은 경로 리스트-->
+<!--    빌드 결과물인 target/classes/ 또는 WEB-INF/classes와 매핑된다-->
+<!--    src/main/java와 src/main/resources 의 파일들이 메이븐에 의해 classpath로 복사되며, java는 클래스 파일들이 resources는 설정파일들이 위치한다.-->
+    <context:property-placeholder
+            location="classpath:jdbc-dev.properties"
+            ignore-unresolvable="false"/>
+
+    <!-- 2.  컴포넌트 스캔 (Service·Repository·도메인 유틸만) -->
+    <context:component-scan base-package="org.barcode.core">
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.RestController"/>
+    </context:component-scan>
+
+    <!-- 3.  HikariCP 데이터소스 -->
+    <bean id="dataSource"
+          class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="jdbcUrl"  value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!-- 선택적 풀 파라미터 -->
+        <property name="maximumPoolSize" value="10"/>
+        <property name="minimumIdle"     value="2"/>
+        <property name="connectionTimeout" value="30000"/>
+        <property name="poolName"        value="HikariMySQLPool"/>
+    </bean>
+
+    <!-- 4.  MyBatis SqlSessionFactory -->
+    <bean id="sqlSessionFactory"
+          class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 매퍼 XML 위치 패턴 -->
+        <property name="mapperLocations"
+                  value="classpath*:mapper/**/*.xml"/>
+        <!-- 도메인 타입 알리아스 패키지 -->
+        <property name="typeAliasesPackage"
+                  value="org.barcode.core.**.domain"/>
+    </bean>
+
+    <!-- SqlSessionTemplate -->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory"/>
+    </bean>
+
+    <!-- 5.  매퍼 인터페이스 자동 스캔  -->
+    <mybatis-spring:scan base-package="org.barcode.core.**.repository"/>
+
+    <!-- 6.  트랜잭션 설정  -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+    <!-- hibernate-validator -->
+    <bean id="messageSource"
+          class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+    <bean id="validator"
+          class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="validationMessageSource" ref="messageSource"/>
+    </bean>
+
+    <mvc:annotation-driven validator="validator"/>
+
+
+
+    <!-- 7.  암호화 유틸 (BCrypt) -->
+<!--    <bean id="passwordEncoder"-->
+<!--          class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>-->
+
+    <!-- 8.  (선택) 국제화 메시지소스  -->
+    <!--
+    <bean id="messageSource"
+          class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basenames" value="classpath:messages/messages"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+    -->
+</beans>

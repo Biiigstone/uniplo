@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context
+           https://www.springframework.org/schema/context/spring-context.xsd
+         http://www.springframework.org/schema/mvc
+           https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 1. (웹 전용) 컴포넌트 스캔 : 컨트롤러만 잡는다 -->
+    <context:component-scan base-package="org.barcode.web">
+        <!-- Controller 계층만 포함 -->
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.RestController"/>
+        <!-- Service/Repository 등은 Root AC에 이미 등록돼 있으므로 제외 -->
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Service"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+
+    <!-- 2. Spring-MVC 기본 기능 (Annotation-Driven) -->
+    <!--  - @RequestMapping 파싱
+         - HTTP-<->객체 메시지컨버터(JSON 직렬화 등)
+         - @Valid 검사 등 -->
+    <mvc:annotation-driven/>
+
+    <!-- 3. 정적 리소스 매핑 -->
+    <!--  /resources/ 하위(JS·CSS·이미지) 파일을 서블릿 컨테이너가 그대로 서빙 -->
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+
+    <!-- 4. ViewResolver (JSP) -->
+    <!--  컨트롤러에서 "login" 반환 -> /WEB-INF/views/login.jsp forward -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- 5. (선택) 파일 업로드용 MultipartResolver -->
+    <!-- <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="10485760"/> <!- 10 MB -->
+    <!-- </bean> -->
+
+    <!-- 6. (선택) 공통 인터셉터 -->
+    <!--
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.example.web.interceptor.LoggingInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    -->
+
+    <!-- 7. 단순 뷰 매핑 (루트 페이지 등) -->
+    <mvc:view-controller path="/" view-name="home"/>
+    <!-- 8. 서블릿 측에서도 루트 컨텍스트의 hibernate-validator 참조하도록    -->
+    <mvc:annotation-driven validator="validator"/>
+
+</beans>
