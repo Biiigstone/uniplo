@@ -23,16 +23,13 @@ public class User {
     }
 
     // UserId는 keyProperty로 GeneratedKeys를 사용하므로, null로 비워둔다.
-    public User(String userEmail, String userPassword, String userLastName, String userFirstName, String userPhoneNumber, LocalDate userBirthDate, Boolean isAgreed, char userStatus, char userRole) {
+    public User(String userEmail, String userPassword, String userLastName, String userFirstName, String userPhoneNumber, LocalDate userBirthDate) {
         this.userEmail = userEmail;
         this.userPassword = userPassword;
         this.userLastName = userLastName;
         this.userFirstName = userFirstName;
         this.userPhoneNumber = userPhoneNumber;
         this.userBirthDate = userBirthDate;
-        this.isAgreed = isAgreed;
-        this.userStatus = userStatus;
-        this.userRole = userRole;
     }
 
 
