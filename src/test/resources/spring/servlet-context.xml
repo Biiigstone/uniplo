@@ -35,7 +35,13 @@
     <bean id="validator"
           class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
-    <mvc:annotation-driven validator="validator" />
+    <bean id="conversionService"
+          class="org.springframework.format.support.FormattingConversionServiceFactoryBean"/>
+
+
+
+    <mvc:annotation-driven conversion-service="conversionService"
+                           validator="validator"/>
 
 
 

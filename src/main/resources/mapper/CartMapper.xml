@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 인터페이스 경로 -->
+<mapper namespace="org.barcode.core.cart.repository.CartMapper">
+<!--CRUD-->
+    <!-- CREATE    -->
+    <insert id="insert" parameterType="map">
+        INSERT INTO cart(user_id, item_id, item_color_code, item_size_code, cart_reg_date)
+        VALUES (#{user_id}, #{item_id}, #{item_color_code}, #{item_size_code}, #{cart_reg_date})
+    </insert>
+
+    <!--READ    -->
+    <select id="findCartByUserId" resultType="CartDto" parameterType="String">
+        SELECT * FROM cart
+        WHERE user_id = #{user_id}
+    </select>
+
+    <select id="findItemByUserAndItemDetails" resultType="CartDto" parameterType="String">
+            SELECT * FROM cart
+            WHERE user_id = #{user_id}
+            AND item_id = #{item_id}
+            AND item_color_code = #{item_color_code}
+            AND item_size_code = #{item_size_code}
+    </select>
+    <!--UPDATE   -->
+<!--    이거.. 수량은 애플리케이션 단에서 처리하기로 했는데.. 어떻게 하지? -->
+
+<!--    Delete -->
+
+    <delete id="deleteAllItemsByUserId" parameterType="String">
+        DELETE FROM cart
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <delete id="deleteItemByUserId" parameterType="String">
+        DELETE FROM cart
+        WHERE user_id = #{user_id}
+        AND item_id = #{item_id}
+        AND item_color_code = #{item_color_code}
+        AND item_size_code = #{item_size_code}
+    </delete>
+</mapper>

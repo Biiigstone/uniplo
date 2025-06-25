@@ -37,4 +37,4 @@ public record UserRequestRecord(
         @NotBlank @Size(max = 20) @Pattern(regexp = "^[가-힣a-zA-Z]+$") String userLastName,
         @NotBlank @Size(max = 20) @Pattern(regexp = "^[가-힣a-zA-Z]+$") String userFirstName,
         @NotBlank @Size(min = 11, max = 11) @Pattern(regexp = "^[0-9]+$") String userPhoneNumber,
-        @NotBlank @Past LocalDate userBirthDate) {}
+        @NotNull @Past LocalDate userBirthDate) {}

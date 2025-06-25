@@ -48,16 +48,18 @@
         <property name="poolName"        value="HikariMySQLPool"/>
     </bean>
 
+
+
     <!-- 4.  MyBatis SqlSessionFactory -->
     <bean id="sqlSessionFactory"
           class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <!-- 매퍼 XML 위치 패턴 -->
         <property name="mapperLocations"
-                  value="classpath*:mapper/**/*.xml"/>
+                  value="classpath*:mapper/UserMapper.xml"/>
         <!-- 도메인 타입 알리아스 패키지 -->
         <property name="typeAliasesPackage"
-                  value="org.barcode.core.**.domain, org.barcode.web.cart.**.dto"/>
+                  value="org.barcode.core.**.domain"/>
     </bean>
 
     <!-- SqlSessionTemplate -->
@@ -88,10 +90,11 @@
         <property name="validationMessageSource" ref="messageSource"/>
     </bean>
 
-    <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
+
+    <mybatis-spring:scan base-package="org.barcode.core.**.Mapper"/>
 
 
-    <!--    <mvc:annotation-driven validator="validator"/>-->
+<!--    <mvc:annotation-driven validator="validator"/>-->
 
 
 

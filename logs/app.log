@@ -1,0 +1,10 @@
+2025-06-24 16:45:42 [main] WARN  o.m.s.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[org.barcode.core.**.Mapper]' package. Please check your configuration.
+2025-06-24 16:45:42 [main] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2025-06-24 16:45:43 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariMySQLPool - Starting...
+2025-06-24 16:45:43 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariMySQLPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@fb0a08c
+2025-06-24 16:45:43 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariMySQLPool - Start completed.
+2025-06-24 16:45:43 [main] INFO  o.s.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+2025-06-24 16:45:43 [main] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+2025-06-24 16:45:43 [main] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+2025-06-24 16:45:43 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariMySQLPool - Shutdown initiated...
+2025-06-24 16:45:43 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariMySQLPool - Shutdown completed.
